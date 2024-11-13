@@ -5,6 +5,6 @@ namespace GymBookingSystem.Models
     public class ApplicationUser : IdentityUser
     {
         // Navigation prop:
-        public ICollection<ApplicationUserGymClass> AttendedClasses { get; set; }
+        public ICollection<ApplicationUserGymClass> AttendedClasses { get; set; } = new List<ApplicationUserGymClass>();
     }
 }
