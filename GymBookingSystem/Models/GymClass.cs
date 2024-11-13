@@ -8,5 +8,8 @@
         public TimeSpan Duration { get; set; }
         public DateTime EndTime { get { return StartTime + Duration; } } // only get prop, will not be saved to GymClass table as a col
         public string Description { get; set; }
+
+        // Navigation prop:
+        public ICollection<ApplicationUserGymClass> AttendingMembers { get; set; }
     }
 }
