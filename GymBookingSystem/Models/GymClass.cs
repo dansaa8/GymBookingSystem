@@ -6,7 +6,7 @@
         public string Name { get; set; }
         public DateTime StartTime { get; set; }
         public TimeSpan Duration { get; set; }
-        public DateTime EndTime { get { return StartTime + Duration; } }
+        public DateTime EndTime { get { return StartTime + Duration; } } // only get prop, will not be saved to GymClass table as a col
         public string Description { get; set; }
     }
 }
