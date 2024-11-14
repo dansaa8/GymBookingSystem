@@ -7,16 +7,53 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GymBookingSystem.Data;
 using GymBookingSystem.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymBookingSystem.Controllers
 {
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public GymClassesController(ApplicationDbContext context)
+        public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
+        }
+
+        //[Authorize]
+        public async Task<IActionResult> BookingToggle(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var userId = _userManager.GetUserId(User); // Get logged in user's id
+
+            var gymClass = await _context.GymClasses
+                           .Include(gc => gc.AttendingMembers) // Include navigation property
+                           .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (gymClass == null) return NotFound(); // if no gymclass is found with given id
+
+            var userInGymClass = gymClass.AttendingMembers
+                .Where(am => am.ApplicationUserId == userId)
+                .FirstOrDefault(); // See if user is in selected gymclass
+
+            if (userInGymClass == null)
+            {
+                gymClass.AttendingMembers.Add(new ApplicationUserGymClass
+                {
+                    ApplicationUserId = userId,
+                    GymClassId = gymClass.Id
+                });
+            }
+            else
+            {
+                gymClass.AttendingMembers.Remove(userInGymClass);
+            }
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: GymClasses

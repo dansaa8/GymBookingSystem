@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymBookingSystem.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241113142927_Init")]
+    [Migration("20241114111525_Init")]
     partial class Init
     {
         /// <inheritdoc />
