@@ -23,37 +23,36 @@ namespace GymBookingSystem.Controllers
             _userManager = userManager;
         }
 
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> BookingToggle(int? id)
         {
             if (id == null) return NotFound();
 
             var userId = _userManager.GetUserId(User); // Get logged in user's id
 
-            var gymClass = await _context.GymClasses
-                           .Include(gc => gc.AttendingMembers) // Include navigation property
-                           .FirstOrDefaultAsync(m => m.Id == id);
+            // Search through join table to see if logged in user is joined with the given class id
+            var userInGymClass = await _context.ApplicationUserGymClasses 
+                                .Where(jt => jt.GymClassId == id && jt.ApplicationUserId == userId)
+                                .FirstOrDefaultAsync();
 
-            if (gymClass == null) return NotFound(); // if no gymclass is found with given id
-
-            var userInGymClass = gymClass.AttendingMembers
-                .Where(am => am.ApplicationUserId == userId)
-                .FirstOrDefault(); // See if user is in selected gymclass
-
-            if (userInGymClass == null)
+            if (userInGymClass == null) // If not, then a new entry in the join table is created
             {
-                gymClass.AttendingMembers.Add(new ApplicationUserGymClass
+                var newAttendance = new ApplicationUserGymClass
                 {
-                    ApplicationUserId = userId,
-                    GymClassId = gymClass.Id
-                });
+                    GymClassId = id.Value,
+                    ApplicationUserId = userId
+                };
+
+                _context.ApplicationUserGymClasses.Add(newAttendance);
             }
             else
             {
-                gymClass.AttendingMembers.Remove(userInGymClass);
+                _context.ApplicationUserGymClasses.Remove(userInGymClass); // else we remove the entry from the join table
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
+
         }
 
         // GET: GymClasses
