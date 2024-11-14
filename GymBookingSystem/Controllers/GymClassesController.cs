@@ -31,7 +31,7 @@ namespace GymBookingSystem.Controllers
             var userId = _userManager.GetUserId(User); // Get logged in user's id
 
             // Search through join table to see if logged in user is joined with the given class id
-            var userInGymClass = await _context.ApplicationUserGymClasses 
+            var userInGymClass = await _context.ApplicationUserGymClasses
                                 .Where(jt => jt.GymClassId == id && jt.ApplicationUserId == userId)
                                 .FirstOrDefaultAsync();
 
@@ -68,6 +68,16 @@ namespace GymBookingSystem.Controllers
             {
                 return NotFound();
             }
+
+            var attendeeIds = await _context.ApplicationUserGymClasses
+                .Where(jt => jt.GymClassId == id)
+                .Select(jt => jt.ApplicationUserId) // only select id prop
+                .ToListAsync();
+
+            ViewBag.attendeeEmails = await _context.Users
+                .Where(u => attendeeIds.Contains(u.Id)) 
+                .Select(u => u.Email) 
+                .ToListAsync(); 
 
             var gymClass = await _context.GymClasses
                 .FirstOrDefaultAsync(m => m.Id == id);
