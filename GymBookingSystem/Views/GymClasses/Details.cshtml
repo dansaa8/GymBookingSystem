@@ -43,9 +43,9 @@
 
 <h4>Attending members:</h4>
 <div>
-    @foreach (string email in ViewBag.attendeeEmails)
+    @foreach (string fullName in ViewBag.attendeesFullName)
     {
-        <div>@email</div>
+        <div>@fullName</div>
     }
 </div>
 
