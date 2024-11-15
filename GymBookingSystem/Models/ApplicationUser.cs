@@ -4,7 +4,11 @@ namespace GymBookingSystem.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        // Navigation prop:
-        public ICollection<ApplicationUserGymClass> AttendedClasses { get; set; } = new List<ApplicationUserGymClass>();
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string FullName => $"{FirstName} {LastName}"; // Shadow prop
+        public DateTime TimeOfRegistration { get; set; }
+        public ICollection<ApplicationUserGymClass> AttendedClasses { get; set; } = new List<ApplicationUserGymClass>(); // Navigation prop
     }
 }
